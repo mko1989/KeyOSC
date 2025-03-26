@@ -1,0 +1,40 @@
+{
+  "name": "keyosc",
+  "version": "1.0.0",
+  "description": "OSC bridge for controlling Keynote from Companion",
+  "main": "electron.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.keyosc",
+    "productName": "KeyOSC",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": "dmg"
+    },
+    "files": [
+      "**/*",
+      "!**/.git/**/*"
+    ]
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chokidar": "^3.5.2",
+    "electron-store": "^8.2.0",
+    "express": "^4.17.1",
+    "node-osc": "^4.1.0"
+  },
+  "devDependencies": {
+    "electron": "^35.1.0",
+    "electron-builder": "^25.1.8"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>KeyOSC</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      color: #333;
+      font-size: 13px;
+    }
+    h1 {
+      color: #333;
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: #f5f5f5;
+      padding: 5px 10px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .card-body {
+      padding: 8px;
+    }
+    .form-group {
+      margin-bottom: 8px;
+    }
+    label {
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 500;
+      font-size: 12px;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 4px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button:hover {
+      background: #0063b1;
+    }
+    button.secondary {
+      background: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    button.secondary:hover {
+      background: #e5e5e5;
+    }
+    .log-container {
+      height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    .presentations-container {
+      height: 150px;
+      overflow-y: auto;
+      font-size: 11px;
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    .log-error { color: #d32f2f; }
+    .log-info { color: #0078d7; }
+    .status-item {
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .main-row {
+      display: flex;
+      gap: 10px;
+    }
+    .col-config {
+      flex: 0 0 250px;
+    }
+    .col-status {
+      flex: 0 0 250px;
+    }
+    .col-presentations {
+      flex: 1;
+    }
+    .button-group {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .presentation-item {
+      padding: 4px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .presentation-item:hover {
+      background-color: #f0f8ff;
+    }
+    .not-running {
+      opacity: 0.5;
+    }
+    .bottom-row {
+      display: flex;
+      gap: 10px;
+    }
+    .col-logs {
+      flex: 1;
+    }
+    .folder-info {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+    .folder-path {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KeyOSC</h1>
+    
+    <div class="main-row">
+      <div class="col-config">
+        <div class="card">
+          <div class="card-header">Configuration</div>
+          <div class="card-body">
+            <form id="config-form">
+              <div class="form-group">
+                <label for="oscLocalPort">Local OSC Port</label>
+                <input type="number" id="oscLocalPort" required>
+              </div>
+              <div class="form-group">
+                <label for="oscCompanionPort">Companion OSC Port</label>
+                <input type="number" id="oscCompanionPort" required>
+              </div>
+              <div class="form-group">
+                <label for="oscCompanionIp">Companion IP Address</label>
+                <input type="text" id="oscCompanionIp" required>
+              </div>
+              <div class="form-group">
+                <label for="pollingInterval">Polling Interval (ms)</label>
+                <input type="number" id="pollingInterval" required>
+              </div>
+              <button type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-status">
+        <div class="card">
+          <div class="card-header">
+            Status
+            <button id="refresh-status" class="secondary">Refresh</button>
+          </div>
+          <div class="card-body">
+            <div id="status-container">
+              <div class="status-item">Document: <span id="status-document">None</span></div>
+              <div class="status-item">Slide: <span id="status-slide">0</span> / <span id="status-total">0</span></div>
+              <div class="status-item">Playing: <span id="status-playing">No</span></div>
+              <div class="status-item">OSC: <span id="osc-status">Disconnected</span></div>
+              <div class="button-group">
+                <button id="prev-slide-btn">◀</button>
+                <button id="next-slide-btn">▶</button>
+                <button id="exit-btn" class="secondary">Exit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-presentations">
+        <div class="card">
+          <div class="card-header">Presentations</div>
+          <div class="card-body">
+            <div class="folder-info">
+              <div class="folder-path" id="presentations-path">No folder selected</div>
+              <button id="select-folder-btn">Select Folder</button>
+            </div>
+            <div id="presentations-list" class="presentations-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bottom-row">
+      <div class="col-logs">
+        <div class="card">
+          <div class="card-header">Logs</div>
+          <div class="card-body">
+            <div id="log-container" class="log-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

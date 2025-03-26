@@ -1,0 +1,7 @@
+{
+  "oscLocalPort": 8111,
+  "oscCompanionPort": 8222, 
+  "oscCompanionIp": "127.0.0.1",
+  "presentationsPath": "",
+  "pollingInterval": 300
+}
